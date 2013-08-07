@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Neota</title>
+        <script src="/static/zepto.min.js"></script>
+        <script src="/static/socket.io.min.js"></script>
+        <script src="/static/client.js"></script>
+        <%-scripts%>
+        <%-stylesheets%>
+        <link rel="stylesheet" href="/static/bootstrap.min.css">
+        <style type="text/css">
+          .box { border: 2px solid #ccc; margin: 4px; width: 200px; height: 200px; float: left; }
+          .selected { border: 2px dashed black; }
+          .remote-selected { border: 2px dashed blue; }
+        </style>
+    </head>
+    <body>
+        <header>
+          <%-blocks.header%>
+        </header>
+        <div class="container">
+          <%-body -%>
+        </div>
+        <footer>
+          <%-blocks.footer%>
+        </footer>
+    </body>
+</html>
