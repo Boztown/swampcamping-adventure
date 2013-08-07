@@ -29,7 +29,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('paste', function (data) {
-		socket.broadcast.emit('remote-paste', { content: data.content, boxId: data.boxId });
+		socket.broadcast.emit('remote-paste', { contentType: data.contentType, content: data.content, boxId: data.boxId });
 	});
 });
 
