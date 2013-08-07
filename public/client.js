@@ -30,11 +30,13 @@ function setupSockets() {
 
 	socket.on('remote-paste', function (data) {
 
-		if (data.contentType ==  'image')
-			addImageToBox($('#' + data.boxId), data.content);
+		if (data.contentType ==  'image') {
+			addImageFileToBox($('#' + data.boxId), data.filename);
+		}
 
-		if (data.contentType ==  'text')
-			addTextToBox($('#' + data.boxId), data.content);
+		if (data.contentType ==  'text') {
+			addTextToBox($('#' + data.boxId), data.content);		
+		}
 	});
 };
 
@@ -44,11 +46,69 @@ function setupSockets() {
  */
 function setupListeners() {
 
-	$('body').on('click', '.box', function(e) {
+	var b = $('body');
+
+	b.on('click', '.box', function(e) {
 		selectBox($(this));
 	});
+
+	b.on('click', '#reset', function(e) {
+		$('.box').attr('style', '').html('');
+		saveState();
+	});
+
+	b.on('dragover', '.box', function(e) {
+		e.stopPropagation(); 
+		e.preventDefault(); 
+		e.originalEvent.dataTransfer.dropEffect = 'copy';  
+		dragOverBox($(this));
+	});	
+
+	b.on('dragleave', '.box', function(e) {
+		dragOutBox($(this));
+	});	
+
+	b.on('drop', '.box', function(e) {
+
+        e.stopPropagation(); 
+        e.preventDefault(); 
+
+        var self = $(this); 
+
+        var files = e.originalEvent.dataTransfer.files;  
+        var reader = new FileReader(); 
+
+        if (files[0].type.indexOf('text/') > -1) { 
+
+            reader.onload = function(event) {  
+                addTextToBox(self, event.target.result);
+                socket.emit('paste', { contentType: 'text', content: event.target.result, boxId: $('.selected').attr('id') });
+            }         
+
+            reader.readAsText(files[0],"UTF-8");   
+        }    
+
+        if (files[0].type == 'image/jpeg' || files[0].type == 'image/png') { 
+
+            reader.onload = function(event) {           
+                addImageToBox(self, event.target.result);
+            }    
+
+            reader.readAsDataURL(files[0]);   
+        } 
+	});	
 };
 
+
+function dragOverBox(box) {
+
+	box.addClass('selected');
+};
+
+function dragOutBox(box) {
+
+	box.removeClass('selected');
+}
 
 /**
  * Saves the state of the DOM to the server.
@@ -61,7 +121,7 @@ function saveState() {
 	  data: { dom: $('#canvas').html() },
 	  dataType: 'json',
 	  success: function(data){
-	    console.log(data);
+	    
 	  }
 	});
 };
@@ -89,7 +149,7 @@ function loadState() {
  * @param {String} text
  */
 function addTextToBox(box, text) {
-	box.html('"' + text + '"');
+	box.html('"' + text.substring(0, 140) + '..."');
 	saveState();
 };
 
@@ -100,9 +160,26 @@ function addTextToBox(box, text) {
  * @param {String} image
  */
 function addImageToBox(box, image) {
-	box.attr('style', 'background-image: url(' + image + ')');
-	saveState();
+
+	$.ajax({
+	  type: 'POST',
+	  url: '/saveimage',
+	  data: { base: image },
+	  dataType: 'json',
+	  success: function(data) {
+	  	
+	  	addImageFileToBox(box, data.filename);
+	  	socket.emit('paste', { contentType: 'image', filename: data.filename, boxId: $('.selected').attr('id') });
+	  	$('.box').removeClass('selected');
+	  	saveState();
+	  }
+	});	
 };
+
+function addImageFileToBox(box, filename) {
+
+	box.attr('style', 'background-image: url(static/uploads/' + filename + ')');
+}
 
 
 /**
@@ -142,7 +219,7 @@ document.onpaste = function(event) {
         var reader = new FileReader();
 		reader.onload = function(e) {
 			addImageToBox($('.selected'), e.target.result);
-			socket.emit('paste', { contentType: 'image', content: e.target.result, boxId: $('.selected').attr('id') });
+
 		}; 
 
 		reader.readAsDataURL(blob);      
@@ -172,5 +249,7 @@ document.onpaste = function(event) {
 
   reader.readAsDataURL(blob);
 */
-}
+};
+
+
 

@@ -9,16 +9,18 @@
         <%-stylesheets%>
         <link rel="stylesheet" href="/static/bootstrap.min.css">
         <style type="text/css">
-          .box { background-size: 100% auto; background-repeat: no-repeat; background-position-y: 50%; border: 2px solid #ccc; font-style: italic; margin: 4px; width: 200px; height: 200px; float: left; padding: 20px; word-wrap: break-word; font-size: 20px; }
+          .box { background-size: 100% auto; background-repeat: no-repeat; background-position-y: 50%; border: 2px solid #ccc; font-style: italic; margin: 4px; width: 200px; height: 200px; float: left; padding: 20px; word-wrap: break-word; font-size: 16px; line-height: 20px; }
           .selected { border: 2px dashed black; }
           .remote-selected { border: 2px dashed blue; }
           .remote-selected.selected { border: 2px dashed red; }
+          .dragover { border: 1px solid black; }
         </style>
     </head>
     <body>
         <header>
           <%-blocks.header%>
         </header>
+        <p><a href="#" id="reset">reset</a></p>
         <div class="container" id="canvas">
           <%-body -%>
         </div>

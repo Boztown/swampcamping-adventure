@@ -24,10 +24,21 @@ app.get('/', function(req, res){
 
 app.post('/save', function(req, res){
 
-	console.log(req.body.dom);
 	fs.writeFile('dom.html', req.body.dom);
 	res.send({ some: JSON.stringify({response:'json' })});
 	res.end();
+});
+
+app.post('/saveimage', function(req, res){
+
+	var base64Data = req.body.base.replace(/^data:image\/jpeg;base64,/,"").replace(/^data:image\/png;base64,/,"");
+	var filename = Math.random().toString(36).substring(7) + '.png'
+
+	fs.writeFile("public/uploads/" + filename, base64Data, 'base64', function(err) {
+	  //console.log(err);
+	});
+
+	res.json({ filename: filename });
 });
 
 app.get('/load', function(req, res){
@@ -52,7 +63,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('paste', function (data) {
-		socket.broadcast.emit('remote-paste', { contentType: data.contentType, content: data.content, boxId: data.boxId });
+		socket.broadcast.emit('remote-paste', { contentType: data.contentType, filename: data.filename, content: data.content, boxId: data.boxId });
 	});
 });
 
