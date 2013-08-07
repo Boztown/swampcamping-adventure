@@ -30,7 +30,7 @@ $(document).ready(function() {
 
 
 function addTextToBox(box, text) {
-	box.html('"' + s + '"');
+	box.html('"' + text + '"');
 }
 
 function selectBox(box) {
@@ -64,14 +64,14 @@ document.onpaste = function(event) {
         var blobUrl = window.URL.createObjectURL(blob);
 
         $('.selected').attr('style', 'background: url(' + blobUrl + ')');
-        socket.emit('paste', { contentType: 'image', content: e.target.result, boxId: $('.selected').attr('id') });
+        socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
     }
 
     if (items[i].kind == 'string' &&
         items[i].type.indexOf('plain') !== -1) {
 
-        items[i].getAsString(function(s){
-        	$('.selected').html('"' + s + '"');
+        items[i].getAsString(function(s) {
+        	addTextToBox($('.selected'), s);
         	socket.emit('paste', { contentType: 'text', content: s, boxId: $('.selected').attr('id') });
         });
         
