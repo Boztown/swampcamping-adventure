@@ -19,6 +19,11 @@ $(document).ready(function() {
 function setupSockets() {
 
 	// socket listens for when other users select a box
+	socket.on('remote-reset', function (data) {
+		reset();
+	});
+
+	// socket listens for when other users select a box
 	socket.on('remote-select', function (data) {
 		$('#' + data.boxId).addClass('remote-selected');
 	});
@@ -41,6 +46,11 @@ function setupSockets() {
 };
 
 
+function reset() {
+	$('.box').attr('style', '').html('');
+	saveState();
+};
+
 /**
  * Add the initial event listeners.
  */
@@ -53,8 +63,8 @@ function setupListeners() {
 	});
 
 	b.on('click', '#reset', function(e) {
-		$('.box').attr('style', '').html('');
-		saveState();
+		reset();
+		socket.emit('reset', { reset: true });
 	});
 
 	b.on('dragover', '.box', function(e) {

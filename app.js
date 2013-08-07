@@ -63,6 +63,10 @@ io.sockets.on('connection', function (socket) {
 	socket.on('paste', function (data) {
 		socket.broadcast.emit('remote-paste', { contentType: data.contentType, filename: data.filename, content: data.content, boxId: data.boxId });
 	});
+
+	socket.on('reset', function (data) {
+		socket.broadcast.emit('remote-reset', { reset: data.reset });
+	});
 });
 
 server.listen(3000);
