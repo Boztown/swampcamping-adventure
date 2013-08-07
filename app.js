@@ -52,8 +52,6 @@ app.get('/load', function(req, res){
 
 io.sockets.on('connection', function (socket) {
 	
-	socket.emit('news', { hello: 'world' });
-
 	socket.on('box-selected', function (data) {
 		socket.broadcast.emit('remote-select', { boxId: data.boxId });
 	});
