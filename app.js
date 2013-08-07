@@ -19,7 +19,7 @@ app.configure(function() {
 
 
 app.get('/', function(req, res){
-	res.render('about.ejs');
+	res.render('index.ejs');
 });
 
 app.post('/save', function(req, res){
