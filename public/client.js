@@ -1,7 +1,22 @@
+// connect to our socket.io instance
 var socket = io.connect('http://127.0.0.1:3000');
+
+// keeps track of the last user-selected box
 var lastSelectedBox;
 
+
 $(document).ready(function() {
+
+	setupSockets();
+	setupListeners();
+	loadState();
+});
+
+
+/**
+ * Setup all the socket.io connections.
+ */
+function setupSockets() {
 
 	// socket listens for when other users select a box
 	socket.on('remote-select', function (data) {
@@ -21,15 +36,23 @@ $(document).ready(function() {
 		if (data.contentType ==  'text')
 			addTextToBox($('#' + data.boxId), data.content);
 	});
+};
+
+
+/**
+ * Add the initial event listeners.
+ */
+function setupListeners() {
 
 	$('body').on('click', '.box', function(e) {
 		selectBox($(this));
 	});
+};
 
-	loadState();
 
-});
-
+/**
+ * Saves the state of the DOM to the server.
+ */
 function saveState() {
 
 	$.ajax({
@@ -41,9 +64,12 @@ function saveState() {
 	    console.log(data);
 	  }
 	});
+};
 
-}
 
+/**
+ * Loads the state of the DOM from the server.
+ */
 function loadState() {
 
 	$.ajax({
@@ -51,21 +77,38 @@ function loadState() {
 	  url: '/load',
 	  success: function(data){
 	    $('#canvas').html(data);
-	    $('.box').removeClass('selected');
+	    $('.box').removeClass('selected remote-selected');
 	  }
 	});	
-}
+};
 
+
+/**
+ * Adds text to a box.
+ * @param {Object} box
+ * @param {String} text
+ */
 function addTextToBox(box, text) {
 	box.html('"' + text + '"');
 	saveState();
-}
+};
 
+
+/**
+ * Adds an image to a box (as a background).
+ * @param {Object} box
+ * @param {String} image
+ */
 function addImageToBox(box, image) {
 	box.attr('style', 'background-image: url(' + image + ')');
 	saveState();
-}
+};
 
+
+/**
+ * Selects a box (adds decoration, emits broadcast).
+ * @param {Object} box
+ */
 function selectBox(box) {
 
 	// null check in case of first selection
