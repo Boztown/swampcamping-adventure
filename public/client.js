@@ -16,7 +16,7 @@ $(document).ready(function() {
 	socket.on('remote-paste', function (data) {
 
 		if (data.contentType ==  'image')
-			$('#' + data.boxId).attr('style', 'background: url(' + data.content + ')');
+			$('#' + data.boxId).attr('style', 'background: url(' + data.content + ') no-repeat 100% 100%');
 
 		if (data.contentType ==  'text')
 			addTextToBox($('#' + data.boxId), data.content);
@@ -63,7 +63,7 @@ document.onpaste = function(event) {
         window.URL = window.URL || window.webkitURL;
         var blobUrl = window.URL.createObjectURL(blob);
 
-        $('.selected').attr('style', 'background: url(' + blobUrl + ')');
+        $('.selected').attr('style', 'background-image: url(' + blobUrl + ')');
         socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
     }
 
