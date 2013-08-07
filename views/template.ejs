@@ -12,13 +12,14 @@
           .box { background-size: 100% auto; background-repeat: no-repeat; background-position-y: 50%; border: 2px solid #ccc; font-style: italic; margin: 4px; width: 200px; height: 200px; float: left; padding: 20px; word-wrap: break-word; font-size: 20px; }
           .selected { border: 2px dashed black; }
           .remote-selected { border: 2px dashed blue; }
+          .remote-selected.selected { border: 2px dashed red; }
         </style>
     </head>
     <body>
         <header>
           <%-blocks.header%>
         </header>
-        <div class="container">
+        <div class="container" id="canvas">
           <%-body -%>
         </div>
         <footer>

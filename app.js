@@ -3,17 +3,40 @@ var engine = require('ejs-locals')
 var app = express();
 var server = require('http').createServer(app)
 var io = require('socket.io').listen(server);
+var fs = require('fs');
 
-app.use('/static', express.static(__dirname + '/public'));
-app.set('views', __dirname + '/views');
+app.configure(function() {
+  app.set('views', __dirname + '/views');
+  app.engine('ejs', engine);
+  app.engine('html', require('ejs').renderFile);
+  app.use(express.cookieParser());
+  app.use(express.session({ secret: 'neota' }));
+  app.use(express.bodyParser());
+  app.use(app.router);
+  app.use(express.csrf());
+  app.use('/static', express.static(__dirname + '/public'));
+});
 
-// use ejs-locals for all ejs templates:
-app.engine('ejs', engine);
-
-app.engine('html', require('ejs').renderFile);
 
 app.get('/', function(req, res){
 	res.render('about.ejs');
+});
+
+app.post('/save', function(req, res){
+
+	console.log(req.body.dom);
+	fs.writeFile('dom.html', req.body.dom);
+	res.send({ some: JSON.stringify({response:'json' })});
+	res.end();
+});
+
+app.get('/load', function(req, res){
+
+	var r = res;
+
+	fs.readFile('dom.html', function(err, data) {
+		res.send(data);
+    });
 });
 
 io.sockets.on('connection', function (socket) {

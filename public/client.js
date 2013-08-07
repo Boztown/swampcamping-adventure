@@ -16,21 +16,54 @@ $(document).ready(function() {
 	socket.on('remote-paste', function (data) {
 
 		if (data.contentType ==  'image')
-			$('#' + data.boxId).attr('style', 'background: url(' + data.content + ') no-repeat 100% 100%');
+			addImageToBox($('#' + data.boxId), data.content);
 
 		if (data.contentType ==  'text')
 			addTextToBox($('#' + data.boxId), data.content);
 	});
 
-	$('.box').on('click', function(e) {
+	$('body').on('click', '.box', function(e) {
 		selectBox($(this));
 	});
 
+	loadState();
+
 });
 
+function saveState() {
+
+	$.ajax({
+	  type: 'POST',
+	  url: '/save',
+	  data: { dom: $('#canvas').html() },
+	  dataType: 'json',
+	  success: function(data){
+	    console.log(data);
+	  }
+	});
+
+}
+
+function loadState() {
+
+	$.ajax({
+	  type: 'GET',
+	  url: '/load',
+	  success: function(data){
+	    $('#canvas').html(data);
+	    $('.box').removeClass('selected');
+	  }
+	});	
+}
 
 function addTextToBox(box, text) {
 	box.html('"' + text + '"');
+	saveState();
+}
+
+function addImageToBox(box, image) {
+	box.attr('style', 'background-image: url(' + image + ')');
+	saveState();
 }
 
 function selectBox(box) {
@@ -60,11 +93,19 @@ document.onpaste = function(event) {
         items[i].type.indexOf('image/') !== -1) {
 
         var blob = items[i].getAsFile();
-        window.URL = window.URL || window.webkitURL;
-        var blobUrl = window.URL.createObjectURL(blob);
+        //window.URL = window.URL || window.webkitURL;
+        //var blobUrl = window.URL.createObjectURL(blob);
 
-        $('.selected').attr('style', 'background-image: url(' + blobUrl + ')');
-        socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
+        var reader = new FileReader();
+		reader.onload = function(e) {
+			addImageToBox($('.selected'), e.target.result);
+			socket.emit('paste', { contentType: 'image', content: e.target.result, boxId: $('.selected').attr('id') });
+		}; 
+
+		reader.readAsDataURL(blob);      
+	    
+        //addImageToBox($('.selected'), blobUrl);
+        //socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
     }
 
     if (items[i].kind == 'string' &&
@@ -74,7 +115,6 @@ document.onpaste = function(event) {
         	addTextToBox($('.selected'), s);
         	socket.emit('paste', { contentType: 'text', content: s, boxId: $('.selected').attr('id') });
         });
-        
     }
 }
 /*
