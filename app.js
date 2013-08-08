@@ -18,10 +18,19 @@ app.configure(function() {
 });
 
 
+/**
+ * Main route.
+ */
 app.get('/', function(req, res){
-	res.render('index.ejs');
+	var data = {};
+	data.users = io.sockets.clients().length;
+	res.render('index.ejs', data);
 });
 
+
+/**
+ * Saves the state of the DOM to disk.
+ */
 app.post('/save', function(req, res){
 
 	fs.writeFile('dom.html', req.body.dom);
@@ -29,6 +38,10 @@ app.post('/save', function(req, res){
 	res.end();
 });
 
+
+/**
+ * Saves images to the uploads dir.
+ */
 app.post('/saveimage', function(req, res){
 
 	var base64Data = req.body.base.replace(/^data:image\/jpeg;base64,/,"").replace(/^data:image\/png;base64,/,"");
@@ -41,6 +54,10 @@ app.post('/saveimage', function(req, res){
 	res.json({ filename: filename });
 });
 
+
+/**
+ * Loads last saved DOM state.
+ */
 app.get('/load', function(req, res){
 
 	var r = res;
@@ -50,6 +67,10 @@ app.get('/load', function(req, res){
     });
 });
 
+
+/**
+ * Setup socket.io connections.
+ */
 io.sockets.on('connection', function (socket) {
 	
 	socket.on('box-selected', function (data) {

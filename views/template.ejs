@@ -14,10 +14,11 @@
             #canvas { width: 880px; padding: 20px; margin: 0 auto; }
             #reset {  } 
             .box { background-size: 100% auto; background-repeat: no-repeat; background-position-y: 50%; border: 2px solid #ccc; font-style: italic; margin: 4px; width: 200px; height: 200px; float: left; padding: 20px; word-wrap: break-word; font-size: 16px; line-height: 20px; }
-            .box:hover { background: #F2F2F2; }
+            .box:hover { background-color: #F2F2F2; border: 2px solid #9C9C9C; }
             .selected { border: 2px dashed black; }
             .remote-selected { border: 2px dashed blue; }
             .remote-selected.selected { border: 2px dashed red; }
+            footer { background: #E6E6E6; position: fixed; bottom: 0; padding: 18px 0 8px 0; width: 100%; text-align: center; font-size: 18px; }
         </style>
     </head>
     <body>
@@ -31,7 +32,7 @@
           <%-body -%>
         </div>
         <footer>
-          <%-blocks.footer%>
+          <p>There are <strong><%= users %></strong> users online.</p>
         </footer>
     </body>
 </html>
