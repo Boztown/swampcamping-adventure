@@ -1,5 +1,5 @@
 // connect to our socket.io instance
-var socket = io.connect('http://127.0.0.1:3000');
+var socket = io.connect('http://ryanbosinger:3000');
 
 // keeps track of the last user-selected box
 var lastSelectedBox;
