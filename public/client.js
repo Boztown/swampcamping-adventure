@@ -211,10 +211,10 @@ function addImageToBox(box, image) {
 	  dataType: 'json',
 	  success: function(data) {
 	  	
+	  	stopSpinner(box[0]);
 	  	addImageFileToBox(box, data.filename);
 	  	socket.emit('paste', { contentType: 'image', filename: data.filename, boxId: $('.selected').attr('id') });
 	  	$('.box').removeClass('selected');
-	  	stopSpinner(box[0]);
 	  	saveState();
 	  }
 	});	
