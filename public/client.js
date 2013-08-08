@@ -4,7 +4,9 @@ var socket = io.connect('http://127.0.0.1:3000');
 // keeps track of the last user-selected box
 var lastSelectedBox;
 
+// Array to hold our "spinner" icons
 var spinners = [];
+
 
 $(document).ready(function() {
 
@@ -46,11 +48,6 @@ function setupSockets() {
 	});
 };
 
-
-function reset() {
-	$('.box').attr('style', '').html('');
-	saveState();
-};
 
 /**
  * Add the initial event listeners.
@@ -111,16 +108,39 @@ function setupListeners() {
 };
 
 
+/**
+ * Callback for when item is dragged over box.
+ * @param {Object} box
+ */
 function dragOverBox(box) {
 
 	box.addClass('selected');
 };
 
+
+/**
+ * Callback for when item is dragged out of box.
+ * @param {Object} box
+ */
 function dragOutBox(box) {
 
 	box.removeClass('selected');
-}
+};
 
+
+/**
+ * Reset the canvas.  Save state.
+ */
+function reset() {
+	$('.box').attr('style', '').html('');
+	saveState();
+};
+
+
+/**
+ * Start the loading spinner icon.
+ * @param {Object} box
+ */
 function startSpinner(box) {
 
 	var opts = {
@@ -146,6 +166,10 @@ function startSpinner(box) {
 };
 
 
+/**
+ * Stop the loading spinner icon.
+ * @param {Object} box
+ */
 function stopSpinner(box) {
 
 	spinners[box.id].stop();
@@ -247,6 +271,10 @@ function selectBox(box) {
 	lastSelectedBox = box;
 };
 
+
+/**
+ * Handle clipboard.  May only work in Chrome.
+ */
 document.onpaste = function(event) {
   
   	var items = event.clipboardData.items;
@@ -257,8 +285,6 @@ document.onpaste = function(event) {
 	        items[i].type.indexOf('image/') !== -1) {
 
 	        var blob = items[i].getAsFile();
-	        //window.URL = window.URL || window.webkitURL;
-	        //var blobUrl = window.URL.createObjectURL(blob);
 
 	        var reader = new FileReader();
 			reader.onload = function(e) {
@@ -267,9 +293,6 @@ document.onpaste = function(event) {
 			}; 
 
 			reader.readAsDataURL(blob);      
-		    
-	        //addImageToBox($('.selected'), blobUrl);
-	        //socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
 	    }
 
 	    if (items[i].kind == 'string' &&
