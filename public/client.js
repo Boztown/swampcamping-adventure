@@ -4,6 +4,7 @@ var socket = io.connect('http://127.0.0.1:3000');
 // keeps track of the last user-selected box
 var lastSelectedBox;
 
+var spinners = [];
 
 $(document).ready(function() {
 
@@ -120,6 +121,36 @@ function dragOutBox(box) {
 	box.removeClass('selected');
 }
 
+function startSpinner(box) {
+
+	var opts = {
+	  lines: 13, // The number of lines to draw
+	  length: 20, // The length of each line
+	  width: 10, // The line thickness
+	  radius: 30, // The radius of the inner circle
+	  corners: 1, // Corner roundness (0..1)
+	  rotate: 0, // The rotation offset
+	  direction: 1, // 1: clockwise, -1: counterclockwise
+	  color: '#000', // #rgb or #rrggbb
+	  speed: 1, // Rounds per second
+	  trail: 60, // Afterglow percentage
+	  shadow: false, // Whether to render a shadow
+	  hwaccel: false, // Whether to use hardware acceleration
+	  className: 'spinner', // The CSS class to assign to the spinner
+	  zIndex: 2e9, // The z-index (defaults to 2000000000)
+	  top: 'auto', // Top position relative to parent in px
+	  left: 'auto' // Left position relative to parent in px
+	};
+
+	spinners[box.id] = new Spinner(opts).spin(box);
+};
+
+
+function stopSpinner(box) {
+
+	spinners[box.id].stop();
+}
+
 /**
  * Saves the state of the DOM to the server.
  */
@@ -171,6 +202,8 @@ function addTextToBox(box, text) {
  */
 function addImageToBox(box, image) {
 
+	startSpinner(box[0]);
+
 	$.ajax({
 	  type: 'POST',
 	  url: '/saveimage',
@@ -181,6 +214,7 @@ function addImageToBox(box, image) {
 	  	addImageFileToBox(box, data.filename);
 	  	socket.emit('paste', { contentType: 'image', filename: data.filename, boxId: $('.selected').attr('id') });
 	  	$('.box').removeClass('selected');
+	  	stopSpinner(box[0]);
 	  	saveState();
 	  }
 	});	
@@ -215,50 +249,38 @@ function selectBox(box) {
 
 document.onpaste = function(event) {
   
-  var items = event.clipboardData.items;
+  	var items = event.clipboardData.items;
 
-  for (var i = 0; i < items.length; ++i) {
+  	for (var i = 0; i < items.length; ++i) {
 
-    if (items[i].kind == 'file' &&
-        items[i].type.indexOf('image/') !== -1) {
+	    if (items[i].kind == 'file' &&
+	        items[i].type.indexOf('image/') !== -1) {
 
-        var blob = items[i].getAsFile();
-        //window.URL = window.URL || window.webkitURL;
-        //var blobUrl = window.URL.createObjectURL(blob);
+	        var blob = items[i].getAsFile();
+	        //window.URL = window.URL || window.webkitURL;
+	        //var blobUrl = window.URL.createObjectURL(blob);
 
-        var reader = new FileReader();
-		reader.onload = function(e) {
-			addImageToBox($('.selected'), e.target.result);
+	        var reader = new FileReader();
+			reader.onload = function(e) {
+				addImageToBox($('.selected'), e.target.result);
 
-		}; 
+			}; 
 
-		reader.readAsDataURL(blob);      
-	    
-        //addImageToBox($('.selected'), blobUrl);
-        //socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
-    }
+			reader.readAsDataURL(blob);      
+		    
+	        //addImageToBox($('.selected'), blobUrl);
+	        //socket.emit('paste', { contentType: 'image', content: blobUrl, boxId: $('.selected').attr('id') });
+	    }
 
-    if (items[i].kind == 'string' &&
-        items[i].type.indexOf('plain') !== -1) {
+	    if (items[i].kind == 'string' &&
+	        items[i].type.indexOf('plain') !== -1) {
 
-        items[i].getAsString(function(s) {
-        	addTextToBox($('.selected'), s);
-        	socket.emit('paste', { contentType: 'text', content: s, boxId: $('.selected').attr('id') });
-        });
-    }
-}
-/*
-  console.log(JSON.stringify(items)); // will give you the mime types
-  var blob = items[1].getAsFile();
-  var reader = new FileReader();
-
-  reader.onload = function(e) {
-  	//$('.selected').attr('style', 'background: url(' + e.target.result + ')');
-	socket.emit('paste', { content: e.target.result, boxId: $('.selected').attr('id') });
-  }; // data url!
-
-  reader.readAsDataURL(blob);
-*/
+	        items[i].getAsString(function(s) {
+	        	addTextToBox($('.selected'), s);
+	        	socket.emit('paste', { contentType: 'text', content: s, boxId: $('.selected').attr('id') });
+	        });
+	    }
+	}
 };
 
 
