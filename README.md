@@ -1,6 +1,8 @@
 swampcamping-adventure
 ======================
 
+https://www.youtube.com/watch?v=R2IJmX0HQE0
+
 A little example project using NodeJS, Express, socket.io and Zepto.  Multiple users can collaborate to swap out a grid of pictures and text.  Overall it's pretty useless but could make way for something cool.
 
 Features:
